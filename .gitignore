@@ -1,0 +1,8 @@
+# Ignora archivos basura de macOS
+._*
+# Otros archivos temporales
+*.DS_Store
+*.swp
+*.swo
+*.tmp
+*.bak
