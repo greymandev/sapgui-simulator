@@ -2,8 +2,8 @@
 
 class MockElement:
     """
-    Clase que imita un elemento de la GUI de SAP (ej. un campo de texto, un botón).
-    Controla un elemento específico de la ventana de PySimpleGUI.
+    Class that mimics a SAP GUI element (e.g., a text field, a button).
+    Controls a specific element of the FreeSimpleGUI window.
     """
     def __init__(self, window, key):
         self._window = window
@@ -11,66 +11,66 @@ class MockElement:
 
     @property
     def text(self):
-        # Devuelve el valor del elemento en la ventana PySimpleGUI.
+        # Returns the value of the element in the FreeSimpleGUI window.
         return self._window[self._key].get()
 
     @text.setter
     def text(self, value):
-        # Actualiza el valor del elemento en la ventana PySimpleGUI.
+        # Updates the value of the element in the FreeSimpleGUI window.
         self._window[self._key].update(value)
 
     def press(self):
-        # Simula hacer clic en un botón enviando un evento
-        if self._key == "-BTN_PROCESAR-":
-            # Simular el procesamiento del cobro
-            self._window['-ESTADO-'].update("Procesando cobro...")
+        # Simulates clicking a button by sending an event
+        if self._key == "-BTN_PROCESS-":
+            # Simulate payment processing
+            self._window['-STATUS-'].update("Processing payment...")
             self._window.refresh()
             import time
             time.sleep(1)
-            self._window['-ESTADO-'].update("Éxito: Cobro procesado correctamente")
+            self._window['-STATUS-'].update("Success: Payment processed successfully")
             self._window.refresh()
 
 class MockSession:
-    """Clase que imita el objeto 'session' de SAP."""
+    """Class that mimics the SAP 'session' object."""
     def __init__(self, window):
         self._window = window
 
     def findById(self, element_id):
         """
-        Busca un elemento por su ID. En nuestra simulación, el ID será la 'key'
-        de PySimpleGUI que definimos en el layout.
+        Finds an element by its ID. In our simulation, the ID will be the 'key'
+        of FreeSimpleGUI that we defined in the layout.
         
-        Ejemplo: session.findById("-CLIENTE-")
+        Example: session.findById("-CUSTOMER-")
         """
         return MockElement(self._window, element_id)
 
     def get_status_message(self):
-        """Obtiene el mensaje de la barra de estado simulada."""
-        return self._window['-ESTADO-'].get()
+        """Gets the message from the simulated status bar."""
+        return self._window['-STATUS-'].get()
 
 class MockConnection:
-    """Clase que imita el objeto 'connection' de SAP."""
+    """Class that mimics the SAP 'connection' object."""
     def __init__(self, window):
         self._window = window
 
     def children(self, index):
-        # En SAP real, children(0) devuelve la primera sesión.
-        # Aquí, siempre devolvemos nuestra única sesión simulada.
+        # In real SAP, children(0) returns the first session.
+        # Here, we always return our single simulated session.
         if index == 0:
             return MockSession(self._window)
         return None
 
 class MockApplication:
-    """Clase que imita el objeto 'SapGui' de SAP Scripting."""
+    """Class that mimics the SAP 'SapGui' object for SAP Scripting."""
     def GetScriptingEngine(self):
-        # Devuelve un motor falso que puede "conectar".
+        # Returns a fake engine that can "connect".
         return self
         
     def OpenConnection(self, connection_string, WithTicket=None):
-         # En una implementación real, esto abriría una nueva conexión.
-         # Aquí simplemente devolvemos un objeto MockConnection para mantener la compatibilidad de la API.
-         # No es estrictamente necesario para este ejemplo, pero es bueno tenerlo.
-        print(f"Simulando conexión a '{connection_string}'...")
-        # La ventana real se pasa en el constructor de MockConnection
-        # en el script del agente.
-        return True # Simula que la conexión se estableció correctamente
+         # In a real implementation, this would open a new connection.
+         # Here we simply return a MockConnection object to maintain API compatibility.
+         # Not strictly necessary for this example, but good to have.
+        print(f"Simulating connection to '{connection_string}'...")
+        # The real window is passed in the MockConnection constructor
+        # in the agent script.
+        return True # Simulates that the connection was established successfully

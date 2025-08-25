@@ -1,62 +1,62 @@
 # fake_sap_gui.py
 
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 import random
 
 def create_f28_gui():
-    """Crea y gestiona la ventana que simula la transacción F-28."""
+    """Creates and manages the window that simulates the F-28 transaction."""
     
     sg.theme('BlueMono')
 
     layout = [
-        [sg.Text('Simulador de Cobro (F-28)', font=('Helvetica', 16))],
+        [sg.Text('Payment Simulator (F-28)', font=('Helvetica', 16))],
         [sg.HSeparator()],
-        [sg.Text('Datos de cabecera', font=('Helvetica', 12))],
-        [sg.Text('Fecha documento', size=(15, 1)), sg.InputText('25.08.2025', key='-FECHA-')],
-        [sg.Text('Sociedad', size=(15, 1)), sg.InputText('1000', key='-SOCIEDAD-')],
+        [sg.Text('Header data', font=('Helvetica', 12))],
+        [sg.Text('Document date', size=(15, 1)), sg.InputText('25.08.2025', key='-DATE-')],
+        [sg.Text('Company code', size=(15, 1)), sg.InputText('1000', key='-COMPANY-')],
         [sg.HSeparator()],
-        [sg.Text('Datos bancarios', font=('Helvetica', 12))],
-        [sg.Text('Importe', size=(15, 1)), sg.InputText(key='-IMPORTE-')],
+        [sg.Text('Bank data', font=('Helvetica', 12))],
+        [sg.Text('Amount', size=(15, 1)), sg.InputText(key='-AMOUNT-')],
         [sg.HSeparator()],
-        [sg.Text('Selección de partidas abiertas', font=('Helvetica', 12))],
-        [sg.Text('Cliente (Bill-to)', size=(15, 1)), sg.InputText(key='-CLIENTE-')],
-        [sg.Text('Nº Documento', size=(15, 1)), sg.InputText(key='-DOC_NUM-')],
-        [sg.Button('Procesar Cobro', key='-BTN_PROCESAR-'), sg.Button('Salir')],
+        [sg.Text('Open item selection', font=('Helvetica', 12))],
+        [sg.Text('Customer (Bill-to)', size=(15, 1)), sg.InputText(key='-CUSTOMER-')],
+        [sg.Text('Document number', size=(15, 1)), sg.InputText(key='-DOC_NUM-')],
+        [sg.Button('Process Payment', key='-BTN_PROCESS-'), sg.Button('Exit')],
         [sg.HSeparator()],
-        [sg.Text('Estado:', size=(10,1)), sg.Text('', size=(60,1), key='-ESTADO-', text_color='yellow')]
+        [sg.Text('Status:', size=(10,1)), sg.Text('', size=(60,1), key='-STATUS-', text_color='yellow')]
     ]
 
-    window = sg.Window('Simulador SAP F-28', layout, finalize=True)
+    window = sg.Window('SAP F-28 Simulator', layout, finalize=True)
 
-    # Bucle de eventos de la ventana
+    # Window event loop
     while True:
         event, values = window.read()
-        if event == sg.WIN_CLOSED or event == 'Salir':
+        if event == sg.WIN_CLOSED or event == 'Exit':
             break
 
-        # Lógica de negocio simulada al pulsar el botón
-        if event == '-BTN_PROCESAR-':
-            cliente = values['-CLIENTE-']
+        # Simulated business logic when button is pressed
+        if event == '-BTN_PROCESS-':
+            customer = values['-CUSTOMER-']
             doc_num = values['-DOC_NUM-']
-            importe = values['-IMPORTE-']
+            amount = values['-AMOUNT-']
 
-            # Validaciones simples
-            if not all([cliente, doc_num, importe]):
-                window['-ESTADO-'].update('Error: Faltan datos obligatorios para el cobro.', text_color='red')
-            elif not cliente.isdigit() or len(cliente) != 6:
-                window['-ESTADO-'].update(f'Error: ID de cliente "{cliente}" no es válido.', text_color='red')
+            # Simple validations
+            if not all([customer, doc_num, amount]):
+                window['-STATUS-'].update('Error: Missing mandatory data for payment.', text_color='red')
+            elif not customer.isdigit() or len(customer) != 6:
+                window['-STATUS-'].update(f'Error: Customer ID "{customer}" is not valid.', text_color='red')
             elif not doc_num.isdigit():
-                 window['-ESTADO-'].update(f'Error: Documento "{doc_num}" no es numérico.', text_color='red')
+                 window['-STATUS-'].update(f'Error: Document "{doc_num}" is not numeric.', text_color='red')
             else:
-                # Simulación de éxito
-                doc_cobro = random.randint(1400000000, 1499999999)
-                mensaje = f'Éxito: Documento {doc_cobro} contabilizado en la sociedad 1000.'
-                window['-ESTADO-'].update(mensaje, text_color='lightgreen')
+                # Success simulation
+                payment_doc = random.randint(1400000000, 1499999999)
+                message = f'Success: Document {payment_doc} posted in company code 1000.'
+                window['-STATUS-'].update(message, text_color='lightgreen')
                 
-                # Limpiamos los campos para la siguiente operación
-                window['-CLIENTE-'].update('')
+                # Clear fields for next operation
+                window['-CUSTOMER-'].update('')
                 window['-DOC_NUM-'].update('')
-                window['-IMPORTE-'].update('')
+                window['-AMOUNT-'].update('')
 
 
     window.close()
