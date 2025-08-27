@@ -1,17 +1,18 @@
 # SAP GUI Simulator
 
-A Python-based SAP GUI simulator that allows automated agents to interact with a simulated SAP interface using the same SAP Scripting API commands used in real SAP systems.
+A Python-based SAP GUI simulator that provides automated agents with a realistic SAP interface using the same SAP Scripting API commands used in real SAP systems. Features robust macOS GUI thread safety and LangGraph integration.
 
 ## Overview
 
-This project provides a mock implementation of the SAP Scripting API, enabling developers to:
+This project provides a comprehensive mock implementation of the SAP Scripting API, enabling developers to:
 
 - **Test SAP automation scripts** without needing access to a real SAP system
 - **Develop and debug SAP agents** in a controlled environment
 - **Train AI agents** on SAP workflows using familiar SAP Scripting commands
 - **Prototype SAP integrations** quickly and safely
+- **Build LangGraph agents** with native SAP tool integration
 
-## Features
+## ✨ Features
 
 - 🖥️ **GUI Simulation**: Visual interface mimicking SAP transaction screens
 - 🤖 **Agent Compatible**: Works with automated agents using SAP Scripting API
@@ -19,8 +20,13 @@ This project provides a mock implementation of the SAP Scripting API, enabling d
 - 📊 **Multiple Transactions**: Simulates common SAP transactions (F-28, FBL5N)
 - 🎯 **Easy Testing**: No SAP license or system access required
 - 📋 **Data Display**: Interactive tables showing transaction results
+- ⚡ **LangGraph Ready**: Async tools for LangGraph agent integration
+- 🔧 **Headless Mode**: Core functionality without GUI dependencies
+- 🍎 **macOS Thread Safety**: Robust GUI threading for macOS systems
+- 📄 **Text Export Simulation**: SAP-like text output for LLM processing
+- 🔗 **JSON Conversion**: Automatic text-to-JSON conversion for AI consumption
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 
@@ -40,23 +46,52 @@ cd sapgui-simulator
 pip install FreeSimpleGUI
 ```
 
-3. Run the payment processing agent:
-```bash
-python agente_procesador_cobros.py
+### Usage Options
+
+#### **1. LangGraph Agent Integration (Recommended)**
+
+```python
+from agente_ar import fbl5n, cobros, text_to_json
+
+# Query customer line items
+result = await fbl5n(customer_id="123456", with_gui=False)
+
+# Process payments
+result = await cobros(customer="789012", doc_num="1000000001",
+                     amount="1500.00", with_gui=False)
+
+# Convert SAP text output to JSON
+json_data = await text_to_json(text_data=sap_output,
+                               transaction_type="fbl5n")
 ```
 
-4. Or run the customer line items query agent:
-```bash
-python fbl5n_customer_line_items_agent.py
-```
-
-5. For standalone GUI testing:
+#### **2. Standalone GUI Simulators**
 ```bash
 # F-28 Payment Processing
 python fake_sap_gui.py
 
 # FBL5N Customer Line Items
 python fbl5n_gui_simulator.py
+```
+
+4. **For automated agents:**
+```bash
+# F-28 payment processing agent
+python agente_procesador_cobros.py
+
+# FBL5N customer query agent
+python fbl5n_customer_line_items_agent.py
+```
+
+5. **For LangGraph integration:**
+```bash
+cd agente_ar
+
+# Test headless mode (recommended first)
+python test_tools_headless.py
+
+# Full example with GUI (macOS: run from main thread)
+python langgraph_example.py
 ```
 
 ## Architecture
@@ -138,7 +173,66 @@ sapgui-simulator/
 ├── agente_procesador_cobros.py         # F-28 payment processing agent
 ├── fbl5n_customer_line_items_agent.py  # FBL5N customer query agent
 ├── fake_sap_gui.py                     # F-28 standalone GUI
-└── fbl5n_gui_simulator.py              # FBL5N standalone GUI
+├── fbl5n_gui_simulator.py              # FBL5N standalone GUI
+└── agente_ar/                          # 🆕 LangGraph integration module
+    ├── sap_core.py                     # Core business logic
+    ├── sap_tools.py                    # Async LangGraph tools
+    ├── payment_gui_tool.py             # F-28 GUI tool (thread-safe)
+    ├── query_gui_tool.py               # FBL5N GUI tool (thread-safe)
+    ├── langgraph_example.py            # Usage examples
+    ├── test_tools_headless.py          # Headless testing
+    └── README.md                       # LangGraph module docs
+```
+
+## 🍎 macOS GUI Thread Safety
+
+This simulator includes robust macOS thread safety features to prevent common `NSWindow` threading errors:
+
+### Auto-Detection
+
+The system automatically detects thread safety and switches to appropriate mode:
+
+```python
+# Automatically detects if GUI is safe
+result = await fbl5n(customer_id="123456", with_gui=True)
+
+# On unsafe threads, automatically switches to headless mode
+# Logs: "🚨 GUI requested but not safe on current thread. Switching to headless mode."
+```
+
+### Manual Control
+
+```python
+# Force headless mode for maximum reliability
+result = await fbl5n(customer_id="123456", with_gui=False)
+
+# Check thread safety manually
+from macos_gui_manager import is_gui_safe, get_safe_gui_mode
+if is_gui_safe():
+    print("✅ GUI safe to launch")
+else:
+    print("⚠️ Use headless mode")
+```
+
+### Testing Thread Safety
+
+```bash
+# Test thread safety features
+python macos_gui_safety_demo.py
+```
+
+### Troubleshooting macOS Issues
+
+**Problem**: `NSWindow should only be instantiated on the main thread!`
+**Solution**: The system now auto-detects this and switches to headless mode
+
+**Problem**: GUI appears but crashes when interacting
+**Solution**: Use headless mode (`with_gui=False`) for maximum stability
+
+**Recommendation**: For production LangGraph agents on macOS, always use headless mode:
+```python
+# Production-safe approach
+result = await fbl5n(customer_id="123456", with_gui=False)
 ```
 
 ## Development
@@ -148,13 +242,15 @@ sapgui-simulator/
 1. Extend the GUI layout in the agent file
 2. Add corresponding element handlers in `MockElement`
 3. Implement business logic in the `press()` method
+4. Ensure thread safety with `@gui_thread_safe` decorator
 
 ### Testing Agents
 
 The simulator allows you to test SAP automation agents by:
 1. Running the simulator
-2. Observing agent interactions through the GUI
-3. Validating transaction results
+2. Observing agent interactions through the GUI (if thread-safe)
+3. Using headless mode for reliable testing
+4. Validating transaction results through text exports
 
 ## Contributing
 

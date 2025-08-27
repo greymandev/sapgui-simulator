@@ -10,6 +10,13 @@
 ehthumbs.db
 Thumbs.db
 
+# Archivos de desarrollo temporal
+*_demo.py
+*_test_temp.py
+ESTADO_*.md
+MACOS_THREADING_*.md
+temp_*.py
+
 # Archivos basura de Windows
 Thumbs.db
 ehthumbs.db

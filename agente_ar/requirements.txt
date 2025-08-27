@@ -1,0 +1,19 @@
+# Requirements for agente_ar - LangGraph SAP Tools
+
+# GUI Framework
+FreeSimpleGUI>=5.2.0
+
+# Async support
+asyncio
+
+# Logging (built-in)
+# logging
+
+# LangGraph dependencies (add when integrating)
+# langgraph>=0.1.0
+# langchain>=0.1.0
+# langchain-core>=0.1.0
+
+# Optional: For enhanced logging and monitoring
+# structlog>=24.1.0
+# python-json-logger>=2.0.0
