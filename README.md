@@ -7,7 +7,7 @@ A Python-based SAP GUI simulator that allows automated agents to interact with a
 This project provides a mock implementation of the SAP Scripting API, enabling developers to:
 
 - **Test SAP automation scripts** without needing access to a real SAP system
-- **Develop and debug SAP agents** in a controlled environment  
+- **Develop and debug SAP agents** in a controlled environment
 - **Train AI agents** on SAP workflows using familiar SAP Scripting commands
 - **Prototype SAP integrations** quickly and safely
 
@@ -16,8 +16,9 @@ This project provides a mock implementation of the SAP Scripting API, enabling d
 - 🖥️ **GUI Simulation**: Visual interface mimicking SAP transaction screens
 - 🤖 **Agent Compatible**: Works with automated agents using SAP Scripting API
 - 🔄 **Real API Compatibility**: Uses the same method calls as genuine SAP Scripting
-- 📊 **Transaction Processing**: Simulates common SAP transactions (F-28 Payment Processing)
+- 📊 **Multiple Transactions**: Simulates common SAP transactions (F-28, FBL5N)
 - 🎯 **Easy Testing**: No SAP license or system access required
+- 📋 **Data Display**: Interactive tables showing transaction results
 
 ## Quick Start
 
@@ -44,13 +45,29 @@ pip install FreeSimpleGUI
 python agente_procesador_cobros.py
 ```
 
+4. Or run the customer line items query agent:
+```bash
+python fbl5n_customer_line_items_agent.py
+```
+
+5. For standalone GUI testing:
+```bash
+# F-28 Payment Processing
+python fake_sap_gui.py
+
+# FBL5N Customer Line Items
+python fbl5n_gui_simulator.py
+```
+
 ## Architecture
 
 ### Core Components
 
 - **`fake_sap_scripting_api.py`**: Mock implementation of SAP Scripting API classes
-- **`agente_procesador_cobros.py`**: Example automated agent for payment processing
-- **`fake_sap_gui.py`**: Basic GUI simulator (if needed)
+- **`agente_procesador_cobros.py`**: Example automated agent for payment processing (F-28)
+- **`fbl5n_customer_line_items_agent.py`**: Automated agent for customer line items query (FBL5N)
+- **`fake_sap_gui.py`**: Basic F-28 GUI simulator (standalone)
+- **`fbl5n_gui_simulator.py`**: Basic FBL5N GUI simulator (standalone)
 
 ### API Classes
 
@@ -61,6 +78,7 @@ python agente_procesador_cobros.py
 
 ## Usage Example
 
+### F-28 Payment Processing
 ```python
 from fake_sap_scripting_api import MockApplication, MockConnection
 
@@ -71,12 +89,31 @@ connection = MockConnection(window)  # Pass GUI window
 session = connection.children(0)
 
 # Use standard SAP Scripting commands
-session.findById("-CLIENTE-").text = "123456"
+session.findById("-CUSTOMER-").text = "123456"
 session.findById("-DOC_NUM-").text = "1800000789"
-session.findById("-IMPORTE-").text = "1250.75"
-session.findById("-BTN_PROCESAR-").press()
+session.findById("-AMOUNT-").text = "1250.75"
+session.findById("-BTN_PROCESS-").press()
 
 # Get status
+status = session.get_status_message()
+```
+
+### FBL5N Customer Line Items Query
+```python
+from fake_sap_scripting_api import MockApplication, MockConnection
+
+# Same connection process
+SapGui = MockApplication()
+engine = SapGui.GetScriptingEngine()
+connection = MockConnection(window)
+session = connection.children(0)
+
+# Query customer line items
+session.findById("-CUSTOMER_ID-").text = "123456"
+session.findById("-COMPANY_CODE-").text = "1000"
+session.findById("-BTN_EXECUTE-").press()
+
+# Results are displayed in the table
 status = session.get_status_message()
 ```
 
@@ -84,6 +121,7 @@ status = session.get_status_message()
 
 Currently implemented:
 - **F-28**: Payment Processing (Incoming Payments)
+- **FBL5N**: Customer Line Items (Open Items Query)
 
 Planned:
 - FB01: Document Entry
@@ -96,9 +134,11 @@ Planned:
 sapgui-simulator/
 ├── README.md
 ├── .gitignore
-├── fake_sap_scripting_api.py    # Core SAP API simulation
-├── agente_procesador_cobros.py  # Payment processing agent
-└── fake_sap_gui.py             # Basic GUI (optional)
+├── fake_sap_scripting_api.py           # Core SAP API simulation
+├── agente_procesador_cobros.py         # F-28 payment processing agent
+├── fbl5n_customer_line_items_agent.py  # FBL5N customer query agent
+├── fake_sap_gui.py                     # F-28 standalone GUI
+└── fbl5n_gui_simulator.py              # FBL5N standalone GUI
 ```
 
 ## Development

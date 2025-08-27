@@ -29,6 +29,27 @@ class MockElement:
             time.sleep(1)
             self._window['-STATUS-'].update("Success: Payment processed successfully")
             self._window.refresh()
+        elif self._key == "-BTN_EXECUTE-":
+            # Simulate FBL5N execution
+            self._window['-STATUS-'].update("Executing customer line items query...")
+            self._window.refresh()
+            import time
+            time.sleep(1)
+            # Simulate populating the results table
+            import random
+            sample_data = [
+                ["1800000789", "Invoice", "25.08.2025", "1,250.75", "EUR", "Open"],
+                ["1800000790", "Invoice", "20.08.2025", "2,150.00", "EUR", "Open"],
+                ["1800000791", "Credit Memo", "18.08.2025", "-500.00", "EUR", "Open"],
+                ["1800000792", "Invoice", "15.08.2025", "3,750.25", "EUR", "Open"]
+            ]
+
+            # Update the table with sample data
+            if '-TABLE-' in [k for k in self._window.AllKeysDict.keys()]:
+                self._window['-TABLE-'].update(values=sample_data)
+
+            self._window['-STATUS-'].update(f"Success: Found {len(sample_data)} open items for customer")
+            self._window.refresh()
 
 class MockSession:
     """Class that mimics the SAP 'session' object."""
@@ -39,7 +60,7 @@ class MockSession:
         """
         Finds an element by its ID. In our simulation, the ID will be the 'key'
         of FreeSimpleGUI that we defined in the layout.
-        
+
         Example: session.findById("-CUSTOMER-")
         """
         return MockElement(self._window, element_id)
@@ -65,7 +86,7 @@ class MockApplication:
     def GetScriptingEngine(self):
         # Returns a fake engine that can "connect".
         return self
-        
+
     def OpenConnection(self, connection_string, WithTicket=None):
          # In a real implementation, this would open a new connection.
          # Here we simply return a MockConnection object to maintain API compatibility.
